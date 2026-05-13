@@ -20,6 +20,7 @@ type StudioShellProps = {
 type GenerateResponse = {
   error?: string;
   id?: string;
+  imageBase64?: string;
   imageUrl?: string;
   message?: string;
   model?: string;
@@ -70,7 +71,7 @@ export function StudioShell({
         {
           id: response.id || crypto.randomUUID(),
           role: "assistant",
-          content: response.message || "Mock generation complete.",
+          content: response.message || "Generation complete.",
           imageUrl: response.imageUrl,
           meta: `${response.provider} / ${response.model}`,
         },
