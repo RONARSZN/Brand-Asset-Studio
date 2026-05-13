@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import type { Brand } from "@/lib/brands";
 import { deleteBrandAction } from "@/app/library/actions";
 
 type BrandCardProps = {
   brand: Brand;
   isConfirming: boolean;
+  isSelected: boolean;
   onCancel: () => void;
   onRequestDelete: () => void;
 };
@@ -13,11 +15,16 @@ type BrandCardProps = {
 export function BrandCard({
   brand,
   isConfirming,
+  isSelected,
   onCancel,
   onRequestDelete,
 }: BrandCardProps) {
   return (
-    <article className="border border-border bg-surface p-5">
+    <article
+      className={`border bg-surface p-5 ${
+        isSelected ? "border-accent" : "border-border"
+      }`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="truncate text-lg font-semibold text-text">
@@ -28,11 +35,17 @@ export function BrandCard({
           </p>
         </div>
         <span className="border border-accent px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
-          Brand
+          {isSelected ? "Open" : "Brand"}
         </span>
       </div>
 
-      <div className="mt-6 border-t border-border pt-4">
+      <div className="mt-6 flex items-center gap-2 border-t border-border pt-4">
+        <Link
+          href={`/library?brand=${brand.id}`}
+          className="flex h-9 items-center border border-border px-3 text-xs font-semibold text-text-muted hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Select
+        </Link>
         {isConfirming ? (
           <form action={deleteBrandAction} className="flex gap-2">
             <input type="hidden" name="id" value={brand.id} />

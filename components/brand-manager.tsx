@@ -1,13 +1,19 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import type { Asset } from "@/lib/assets";
 import type { Brand } from "@/lib/brands";
 import { createBrandAction, type BrandActionState } from "@/app/library/actions";
+import { AssetLibrary } from "@/components/asset-library";
 import { BrandCard } from "@/components/brand-card";
 
 type BrandManagerProps = {
+  assets: Asset[];
+  assetError?: string;
   brands: Brand[];
   error?: string;
+  selectedBrandId?: string;
+  selectedBrandName?: string;
 };
 
 const initialState: BrandActionState = {
@@ -15,7 +21,14 @@ const initialState: BrandActionState = {
   message: "",
 };
 
-export function BrandManager({ brands, error }: BrandManagerProps) {
+export function BrandManager({
+  assets,
+  assetError,
+  brands,
+  error,
+  selectedBrandId,
+  selectedBrandName,
+}: BrandManagerProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [state, formAction, isPending] = useActionState(
@@ -93,12 +106,20 @@ export function BrandManager({ brands, error }: BrandManagerProps) {
               key={brand.id}
               brand={brand}
               isConfirming={confirmingId === brand.id}
+              isSelected={selectedBrandId === brand.id}
               onCancel={() => setConfirmingId(null)}
               onRequestDelete={() => setConfirmingId(brand.id)}
             />
           ))}
         </div>
       ) : null}
+
+      <AssetLibrary
+        assets={assets}
+        error={assetError}
+        selectedBrandId={selectedBrandId}
+        selectedBrandName={selectedBrandName}
+      />
     </section>
   );
 }

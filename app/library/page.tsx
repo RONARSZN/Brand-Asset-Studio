@@ -1,9 +1,18 @@
 import { Sidebar } from "@/components/sidebar";
 import { BrandManager } from "@/components/brand-manager";
+import { listAssetsByBrand } from "@/lib/assets";
 import { listBrands } from "@/lib/brands";
 
-export default async function LibraryPage() {
+type LibraryPageProps = {
+  searchParams?: Promise<{ brand?: string }>;
+};
+
+export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const { brands, error } = await listBrands();
+  const params = await searchParams;
+  const selectedBrandId = getSelectedBrandId(params?.brand, brands[0]?.id);
+  const selectedBrand = brands.find((brand) => brand.id === selectedBrandId);
+  const assets = await listAssetsByBrand(selectedBrand?.id);
 
   return (
     <div className="flex min-h-screen bg-background text-text">
@@ -21,9 +30,20 @@ export default async function LibraryPage() {
             </p>
           </div>
 
-          <BrandManager brands={brands} error={error} />
+          <BrandManager
+            assets={assets.assets}
+            assetError={assets.error}
+            brands={brands}
+            error={error}
+            selectedBrandId={selectedBrand?.id}
+            selectedBrandName={selectedBrand?.name}
+          />
         </section>
       </main>
     </div>
   );
+}
+
+function getSelectedBrandId(brandId?: string, fallbackId?: string) {
+  return brandId || fallbackId;
 }
