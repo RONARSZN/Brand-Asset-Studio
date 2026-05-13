@@ -59,6 +59,7 @@ async function generateImage(prompt: string, model: string, pegs: string[]) {
 async function callGeminiImage(prompt: string, model: string, pegs: object[]) {
   const response = await callGoogleModel(`${model}:generateContent`, {
     contents: [{ parts: [{ text: prompt }, ...pegs] }],
+    generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
   });
   assertNotRejected(response);
   const parts = response.candidates?.[0]?.content?.parts ?? [];
@@ -90,7 +91,8 @@ async function callGoogleModel(action: string, body: object) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new GenerationError(mapGoogleError(response.status, data));
+    const status = response.status === 429 ? 429 : 500;
+    throw new GenerationError(mapGoogleError(response.status, data), status);
   }
 
   return data;
@@ -105,7 +107,12 @@ async function fetchPegPart(url: string) {
 
   const mimeType = response.headers.get("content-type") || "image/png";
   const buffer = Buffer.from(await response.arrayBuffer());
-  return { inlineData: { data: buffer.toString("base64"), mimeType } };
+  return {
+    inline_data: {
+      data: buffer.toString("base64"),
+      mime_type: mimeType,
+    },
+  };
 }
 
 function getPegUrls(value: unknown) {
