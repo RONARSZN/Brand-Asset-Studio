@@ -19,6 +19,13 @@ export const GENERATION_MODELS = [
     name: "Imagen 4 Standard",
     costLabel: "$0.04/image - Balanced Paid",
   },
+  {
+    id: "pollinations-flux",
+    name: "Pollinations Flux",
+    costLabel: "Free · No billing required",
+    label: "Pollinations Flux · Free · No billing required",
+    note: "No reference image support",
+  },
 ] as const;
 
 export type GenerationModelId = (typeof GENERATION_MODELS)[number]["id"];

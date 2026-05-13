@@ -9,6 +9,8 @@ type ModelSelectorProps = {
 };
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
+  const selectedModel = GENERATION_MODELS.find((model) => model.id === value);
+
   return (
     <label className="flex flex-col gap-2">
       <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
@@ -21,10 +23,13 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
       >
         {GENERATION_MODELS.map((model) => (
           <option key={model.id} value={model.id}>
-            {model.name} - {model.costLabel}
+            {"label" in model ? model.label : `${model.name} - ${model.costLabel}`}
           </option>
         ))}
       </select>
+      {selectedModel && "note" in selectedModel ? (
+        <span className="text-xs text-text-muted">{selectedModel.note}</span>
+      ) : null}
     </label>
   );
 }

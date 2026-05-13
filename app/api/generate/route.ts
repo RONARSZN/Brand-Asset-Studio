@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import sharp from "sharp";
 import { isGenerationModelId } from "@/lib/generation-models";
 
 type GenerateBody = {
@@ -25,11 +26,12 @@ export async function POST(request: NextRequest) {
       return jsonError("Invalid generation request.", 400);
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (model !== "pollinations-flux" && !process.env.GEMINI_API_KEY) {
       return jsonError("Generation failed. Try again.", 500);
     }
 
     const imageBase64 = await generateImage(prompt, model, pegs);
+    const provider = model === "pollinations-flux" ? "pollinations" : "gemini";
 
     return NextResponse.json({
       id: crypto.randomUUID(),
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
       message: `Generation complete. ${pegs.length} pegs attached.`,
       model,
       pegs,
-      provider: "gemini",
+      provider,
     });
   } catch (error) {
     console.error("[generate] request failed", { error });
@@ -47,6 +49,10 @@ export async function POST(request: NextRequest) {
 }
 
 async function generateImage(prompt: string, model: string, pegs: string[]) {
+  if (model === "pollinations-flux") {
+    return callPollinations(prompt, pegs);
+  }
+
   const geminiModel = GEMINI_MODELS[model as keyof typeof GEMINI_MODELS];
   const pegParts = await Promise.all(pegs.map(fetchPegPart));
 
@@ -55,6 +61,27 @@ async function generateImage(prompt: string, model: string, pegs: string[]) {
   }
 
   return callGeminiImage(prompt, geminiModel, pegParts);
+}
+
+async function callPollinations(prompt: string, pegs: string[]) {
+  const promptWithContext = getPollinationsPrompt(prompt, pegs);
+  const url = new URL(
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(promptWithContext)}`,
+  );
+  url.searchParams.set("width", "1024");
+  url.searchParams.set("height", "1024");
+  url.searchParams.set("model", "flux");
+  url.searchParams.set("nologo", "true");
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new GenerationError("Generation failed. Try again.", response.status);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  const pngBuffer = await sharp(buffer).png().toBuffer();
+  return pngBuffer.toString("base64");
 }
 
 async function callGeminiImage(prompt: string, model: string, pegs: object[]) {
@@ -129,6 +156,35 @@ function getPegUrls(value: unknown) {
   }
 
   return value.filter((item): item is string => typeof item === "string");
+}
+
+function getPollinationsPrompt(prompt: string, pegs: string[]) {
+  const filenames = pegs.map(getFilenameFromUrl).filter(Boolean);
+
+  if (filenames.length === 0) {
+    return prompt;
+  }
+
+  return `${prompt}\n\nStyle context from selected pegs: ${filenames.join(", ")}`;
+}
+
+function getFilenameFromUrl(url: string) {
+  try {
+    const pathname = new URL(url).pathname;
+    const filename = pathname.split("/").filter(Boolean).at(-1) || "";
+    return safeDecode(filename);
+  } catch {
+    const filename = url.split("/").filter(Boolean).at(-1) || "";
+    return safeDecode(filename.split("?")[0] || "");
+  }
+}
+
+function safeDecode(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }
 
 function jsonError(error: string, status: number) {
