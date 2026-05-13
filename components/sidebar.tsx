@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignOutButton } from "@/components/sign-out-button";
 
 const routes = [
   { href: "/library", label: "Library", icon: "L" },
@@ -29,6 +30,8 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
+
+      <SignOutButton />
     </aside>
   );
 }
