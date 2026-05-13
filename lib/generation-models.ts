@@ -30,6 +30,16 @@ export const GENERATION_MODELS = [
 
 export type GenerationModelId = (typeof GENERATION_MODELS)[number]["id"];
 
+export function getGenerationModelLabel(modelId: GenerationModelId) {
+  const model = GENERATION_MODELS.find((item) => item.id === modelId);
+
+  if (!model) {
+    return modelId;
+  }
+
+  return "label" in model ? model.label : `${model.name} - ${model.costLabel}`;
+}
+
 export function isGenerationModelId(value: string): value is GenerationModelId {
   return GENERATION_MODELS.some((model) => model.id === value);
 }

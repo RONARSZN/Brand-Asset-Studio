@@ -15,24 +15,12 @@ export default async function StudioPage({ searchParams }: StudioPageProps) {
   const assets = await listAssetsByBrand(selectedBrand?.id);
 
   return (
-    <div className="flex min-h-screen bg-background text-text">
+    <div className="flex h-screen overflow-hidden bg-background text-text">
       <Sidebar />
-      <main className="min-w-0 flex-1 px-10 py-8">
-        <section className="flex min-h-full flex-col">
-          <div>
-            <p className="mb-3 font-mono text-xs uppercase tracking-[0.22em] text-text-muted">
-              Studio Mode
-            </p>
-            <h1 className="text-3xl font-semibold text-text">
-              Generation Studio
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">
-              Build image directions with active-brand pegs. Generation is mocked
-              until the provider adapter is connected.
-            </p>
-          </div>
+      <main className="min-w-0 flex-1 overflow-hidden">
+        <section className="flex h-full min-w-0 flex-col">
           {error || assets.error ? (
-            <div className="mt-5 border border-red-400 bg-surface p-4 text-sm text-red-200">
+            <div className="shrink-0 border-b border-red-400 bg-surface p-4 text-sm text-red-200">
               {error || assets.error}
             </div>
           ) : null}

@@ -1,7 +1,13 @@
-export type StudioMessage = {
+import type { GenerationModelId } from "@/lib/generation-models";
+
+export type StudioGeneration = {
   id: string;
-  role: "user" | "assistant";
-  content: string;
+  prompt: string;
+  pegCount: number;
+  modelId: GenerationModelId;
+  modelLabel: string;
   imageUrl?: string;
-  meta?: string;
+  provider?: string;
+  status: "pending" | "complete" | "error";
+  error?: string;
 };

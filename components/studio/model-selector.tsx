@@ -1,5 +1,6 @@
 import {
   GENERATION_MODELS,
+  getGenerationModelLabel,
   type GenerationModelId,
 } from "@/lib/generation-models";
 
@@ -9,27 +10,20 @@ type ModelSelectorProps = {
 };
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
-  const selectedModel = GENERATION_MODELS.find((model) => model.id === value);
-
   return (
-    <label className="flex flex-col gap-2">
-      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-        Model
-      </span>
+    <label className="block">
+      <span className="sr-only">Model</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value as GenerationModelId)}
-        className="h-11 border border-border bg-background px-3 text-sm text-text outline-none hover:border-text-muted focus:border-accent"
+        className="h-8 max-w-full bg-transparent pr-8 text-xs text-text-muted outline-none hover:text-text focus:text-accent"
       >
         {GENERATION_MODELS.map((model) => (
           <option key={model.id} value={model.id}>
-            {"label" in model ? model.label : `${model.name} - ${model.costLabel}`}
+            {getGenerationModelLabel(model.id)}
           </option>
         ))}
       </select>
-      {selectedModel && "note" in selectedModel ? (
-        <span className="text-xs text-text-muted">{selectedModel.note}</span>
-      ) : null}
     </label>
   );
 }

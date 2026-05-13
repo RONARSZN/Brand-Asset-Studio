@@ -10,7 +10,9 @@ type PegSelectorProps = {
   activeBrandId?: string;
   assets: Asset[];
   brands: Brand[];
+  isOpen: boolean;
   selectedPegUrls: string[];
+  onClose: () => void;
   onTogglePeg: (fileUrl: string) => void;
 };
 
@@ -18,37 +20,49 @@ export function PegSelector({
   activeBrandId,
   assets,
   brands,
+  isOpen,
   selectedPegUrls,
+  onClose,
   onTogglePeg,
 }: PegSelectorProps) {
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <aside className="flex w-[420px] shrink-0 flex-col border border-border bg-surface">
-      <div className="border-b border-border p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">
-          Reference Pegs
-        </p>
-        <h2 className="mt-2 text-xl font-semibold text-text">Active Brand</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {brands.map((brand) => (
-            <Link
-              key={brand.id}
-              href={`/studio?brand=${brand.id}`}
-              className={`border px-3 py-2 text-xs font-semibold ${
-                activeBrandId === brand.id
-                  ? "border-accent text-accent"
-                  : "border-border text-text-muted hover:border-text-muted hover:text-text"
-              }`}
-            >
-              {brand.name}
-            </Link>
-          ))}
+    <div className="absolute bottom-24 left-3 z-20 w-[356px] border border-border bg-surface shadow-2xl shadow-black/40">
+      <div className="flex items-start justify-between gap-4 border-b border-border p-4">
+        <div className="min-w-0">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent">
+            Reference Pegs
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {brands.map((brand) => (
+              <Link
+                key={brand.id}
+                href={`/studio?brand=${brand.id}`}
+                className={`border px-2.5 py-1.5 text-xs font-semibold ${
+                  activeBrandId === brand.id
+                    ? "border-accent text-accent"
+                    : "border-border text-text-muted hover:border-text-muted"
+                }`}
+              >
+                {brand.name}
+              </Link>
+            ))}
+          </div>
         </div>
-        <p className="mt-4 text-xs text-text-muted">
-          Select up to 14 library assets as visual reference pegs.
-        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="h-8 w-8 border border-border font-mono text-xs text-text-muted hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          aria-label="Close peg selector"
+        >
+          X
+        </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+      <div className="max-h-[48vh] overflow-y-auto p-4">
         {brands.length === 0 ? <EmptyState /> : null}
         {ASSET_TYPES.map((assetType) => (
           <PegTypeSection
@@ -60,7 +74,7 @@ export function PegSelector({
           />
         ))}
       </div>
-    </aside>
+    </div>
   );
 }
 
@@ -80,14 +94,14 @@ function PegTypeSection({
   }
 
   return (
-    <section className="mb-7">
-      <div className="mb-3 flex items-center justify-between">
+    <section className="mb-5">
+      <div className="mb-2 flex items-center justify-between">
         <h3 className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
           {assetType}
         </h3>
         <span className="text-xs text-text-muted">{assets.length}</span>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-2">
         {assets.map((asset) => {
           const isSelected = selectedPegUrls.includes(asset.file_url);
           return (
@@ -108,7 +122,7 @@ function PegTypeSection({
                   alt={asset.original_filename}
                   className="object-cover"
                   fill
-                  sizes="120px"
+                  sizes="80px"
                   unoptimized
                 />
               </span>
