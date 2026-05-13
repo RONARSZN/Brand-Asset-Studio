@@ -23,7 +23,6 @@ export function AssetUploader({ brandId }: AssetUploaderProps) {
     <form
       action={formAction}
       className="border border-border bg-surface p-4"
-      encType="multipart/form-data"
     >
       <input type="hidden" name="brandId" value={brandId} />
       <div className="grid grid-cols-[180px_1fr_auto] items-end gap-3">
