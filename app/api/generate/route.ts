@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       provider: "gemini",
     });
   } catch (error) {
+    console.error("[generate] request failed", { error });
     return jsonError(getErrorMessage(error), getErrorStatus(error));
   }
 }
@@ -88,11 +89,18 @@ async function callGoogleModel(action: string, body: object) {
     },
     method: "POST",
   });
-  const data = await response.json();
+  const responseBody = await response.text();
+  const data = parseGoogleResponse(responseBody);
 
   if (!response.ok) {
-    const status = response.status === 429 ? 429 : 500;
-    throw new GenerationError(mapGoogleError(response.status, data), status);
+    console.error("[generate] Google API error", {
+      action,
+      responseBody,
+      status: response.status,
+      statusText: response.statusText,
+      url,
+    });
+    throw new GenerationError(getGoogleErrorMessage(data), response.status);
   }
 
   return data;
@@ -139,20 +147,6 @@ function getErrorStatus(error: unknown) {
   return error instanceof GenerationError ? error.status : 500;
 }
 
-function mapGoogleError(status: number, data: GoogleError) {
-  const message = data.error?.message?.toLowerCase() ?? "";
-
-  if (status === 429) {
-    return "Rate limit reached. Try again shortly.";
-  }
-
-  if (message.match(/policy|safety|blocked|prohibited|rejected/)) {
-    return "Prompt was rejected. Try rephrasing.";
-  }
-
-  return "Generation failed. Try again.";
-}
-
 function assertNotRejected(data: GoogleResponse) {
   const reason = data.promptFeedback?.blockReason ??
     data.predictions?.[0]?.raiFilteredReason ??
@@ -165,6 +159,22 @@ function assertNotRejected(data: GoogleResponse) {
 
 function throwGenerationFailed(): never {
   throw new GenerationError("Generation failed. Try again.");
+}
+
+function parseGoogleResponse(responseBody: string): GoogleResponse {
+  try {
+    return JSON.parse(responseBody) as GoogleResponse;
+  } catch (error) {
+    console.error("[generate] Google API returned non-JSON body", {
+      error,
+      responseBody,
+    });
+    return {};
+  }
+}
+
+function getGoogleErrorMessage(data: GoogleResponse) {
+  return data.error?.message || "Generation failed. Try again.";
 }
 
 class GenerationError extends Error {
