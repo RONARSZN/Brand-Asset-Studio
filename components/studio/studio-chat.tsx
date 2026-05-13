@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type { FormEvent } from "react";
 import type { GenerationModelId } from "@/lib/generation-models";
 import { ModelSelector } from "@/components/studio/model-selector";
@@ -87,14 +86,7 @@ function MessageBubble({ message }: { message: StudioMessage }) {
       >
         <p className="text-sm leading-6 text-text">{message.content}</p>
         {message.imageUrl ? (
-          <Image
-            src={message.imageUrl}
-            alt="Generated mock output"
-            className="mt-4 aspect-video w-full border border-border object-cover"
-            width={1280}
-            height={720}
-            unoptimized
-          />
+          <GeneratedImage imageUrl={message.imageUrl} messageId={message.id} />
         ) : null}
         {message.meta ? (
           <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
@@ -103,6 +95,32 @@ function MessageBubble({ message }: { message: StudioMessage }) {
         ) : null}
       </div>
     </article>
+  );
+}
+
+function GeneratedImage({
+  imageUrl,
+  messageId,
+}: {
+  imageUrl: string;
+  messageId: string;
+}) {
+  return (
+    <div className="mt-4">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt="Generated output"
+        className="h-auto w-full border border-border"
+      />
+      <a
+        href={imageUrl}
+        download={`studio-generation-${messageId}.png`}
+        className="mt-3 inline-flex h-10 items-center border border-border bg-background px-4 text-sm font-semibold text-text-muted hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        Download
+      </a>
+    </div>
   );
 }
 
