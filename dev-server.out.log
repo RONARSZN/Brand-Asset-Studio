@@ -1,0 +1,16 @@
+
+> brand-asset-studio@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.249:3000
+✓ Ready in 979ms
+
+○ Compiling /login ...
+ GET /login?error=config 200 in 7.7s (next.js: 4.8s, proxy.ts: 1868ms, application-code: 1034ms)
+ GET /login?error=config 200 in 7.7s (next.js: 4.8s, proxy.ts: 1873ms, application-code: 1037ms)
+ GET /login 200 in 55ms (next.js: 3ms, proxy.ts: 7ms, application-code: 45ms)
+ GET /login 200 in 54ms (next.js: 3ms, proxy.ts: 9ms, application-code: 42ms)
+ GET /login?error=config 200 in 69ms (next.js: 3ms, proxy.ts: 6ms, application-code: 59ms)
+[?25h
