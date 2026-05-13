@@ -25,12 +25,15 @@ export function PegSelector({
   onClose,
   onTogglePeg,
 }: PegSelectorProps) {
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="absolute bottom-24 left-3 z-20 w-[356px] border border-border bg-surface shadow-2xl shadow-black/40">
+    <div
+      className={`absolute bottom-[132px] left-3 z-20 w-[356px] border border-border bg-surface shadow-2xl shadow-black/40 transition duration-200 ${
+        isOpen
+          ? "visible translate-y-0 opacity-100"
+          : "invisible pointer-events-none translate-y-3 opacity-0"
+      }`}
+      aria-hidden={!isOpen}
+    >
       <div className="flex items-start justify-between gap-4 border-b border-border p-4">
         <div className="min-w-0">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent">

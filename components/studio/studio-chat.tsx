@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import type { GenerationModelId } from "@/lib/generation-models";
+import { PegToggle } from "@/components/studio/peg-toggle";
 import { StudioComposer } from "@/components/studio/studio-composer";
 import type { StudioGeneration } from "@/components/studio/types";
 
@@ -38,10 +39,15 @@ export function StudioChat({
 }: StudioChatProps) {
   return (
     <section className="relative flex h-full w-[380px] shrink-0 flex-col border-r border-border bg-surface">
-      <div className="shrink-0 border-b border-border px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
           Studio
         </p>
+        <PegToggle
+          isOpen={isPegSelectorOpen}
+          onToggle={onPegSelectorToggle}
+          pegCount={pegCount}
+        />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
@@ -61,10 +67,8 @@ export function StudioChat({
       <StudioComposer
         error={error}
         isGenerating={isGenerating}
-        isPegSelectorOpen={isPegSelectorOpen}
         model={model}
         onModelChange={onModelChange}
-        onPegSelectorToggle={onPegSelectorToggle}
         onPromptChange={onPromptChange}
         onSubmit={onSubmit}
         pegCount={pegCount}
